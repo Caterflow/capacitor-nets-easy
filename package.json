@@ -1,0 +1,57 @@
+{
+  "name": "capacitor-nets-easy",
+  "version": "0.0.1",
+  "description": "Capacitor plugin for Nets Easy (Nexi) in-app payments on iOS and Android",
+  "main": "dist/plugin.cjs.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "unpkg": "dist/plugin.js",
+  "files": [
+    "android/src/main/",
+    "android/build.gradle",
+    "dist/",
+    "ios/Sources/",
+    "ios/Frameworks/",
+    "scripts/",
+    "Package.swift",
+    "CapacitorNetsEasy.podspec"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsc && rollup -c rollup.config.mjs",
+    "clean": "rimraf ./dist",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "download-ios-sdk": "bash scripts/download-ios-sdk.sh"
+  },
+  "keywords": [
+    "capacitor",
+    "plugin",
+    "native",
+    "nets-easy",
+    "nexi",
+    "payment",
+    "mobilepay",
+    "apple-pay",
+    "google-pay"
+  ],
+  "license": "MIT",
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    },
+    "android": {
+      "src": "android"
+    }
+  },
+  "peerDependencies": {
+    "@capacitor/core": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "rimraf": "^6.0.0",
+    "rollup": "^4.18.0",
+    "typescript": "~5.4.0"
+  }
+}

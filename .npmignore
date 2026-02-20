@@ -1,0 +1,7 @@
+scripts/
+example/
+.github/
+android/src/test/
+android/src/androidTest/
+ios/Tests/
+*.tgz

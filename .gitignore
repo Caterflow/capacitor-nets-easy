@@ -1,0 +1,5 @@
+node_modules/
+dist/
+ios/Frameworks/Mia.xcframework
+.DS_Store
+*.tgz
