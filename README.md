@@ -233,13 +233,56 @@ The plugin has no environment toggle — it's determined by which API URLs your 
 
 ### Payment Methods
 
-Configure payment methods in the Create Payment request. See the [Nets Easy docs](https://developer.nexigroup.com/nets-easy/en-EU/docs/payment-methods/) for details on:
+Payment methods are configured server-side — the plugin itself requires no code changes per method. All enabled methods appear automatically on the hosted checkout page.
 
-- **Cards**: Visa, MasterCard, Dankort, AmEx — enabled by default
-- **MobilePay**: The SDK handles app-switching automatically (iOS v1.4.0+ / Android)
-- **Apple Pay**: [Setup guide](https://developer.nexigroup.com/nets-easy/en-EU/docs/apple-pay/) (iOS 16+)
-- **Google Pay**: [Setup guide](https://developer.nexigroup.com/nets-easy/en-EU/docs/google-pay/)
-- **Remember Me / Tokenization**: Use [unscheduled subscriptions](https://developer.nexigroup.com/nets-easy/en-EU/docs/unscheduled-subscriptions-ucof/) for storing cards
+If you omit `paymentMethodsConfiguration` from your Create Payment request, all methods enabled on your merchant account are shown. To show only specific methods, list them explicitly:
+
+```json
+{
+  "paymentMethodsConfiguration": [
+    { "name": "Card" },
+    { "name": "GooglePay" }
+  ]
+}
+```
+
+#### Cards
+
+Visa, MasterCard, Dankort, AmEx — enabled by default. No additional setup.
+
+#### MobilePay
+
+The SDK handles app-switching automatically (iOS v1.4.0+ / Android). Enable MobilePay on your merchant account in the [Easy Portal](https://portal.dibspayment.eu/). On iOS, add `mobilepay` to `LSApplicationQueriesSchemes` in your `Info.plist` for app-switching to work.
+
+#### Google Pay (Android)
+
+Google Pay is rendered as a web-based button on the hosted checkout page inside the WebView. No Android app changes, manifest entries, or Google Pay SDK dependencies are needed on the client side.
+
+**Setup:**
+
+1. **Contact Nexi** at `ecom-salessupport@nets.eu` to enable Google Pay on your merchant ID (test and production are activated separately)
+2. That's it — once activated, the Google Pay button appears on the checkout page automatically
+
+To test: you need a real Google account. In the test environment, a Google test card is provided automatically — no real card needed.
+
+> **Tip:** Avoid showing Google Pay as the *only* payment method. If the user's device doesn't support it, they'll see no payment options. Always include `Card` alongside `GooglePay` in `paymentMethodsConfiguration`.
+
+See the [Nets Easy Google Pay docs](https://developer.nexigroup.com/nets-easy/en-EU/docs/google-pay/) for details.
+
+#### Apple Pay (iOS)
+
+Like Google Pay, Apple Pay is handled by the hosted checkout page. No native Apple Pay SDK integration is needed in the plugin.
+
+**Setup:**
+
+1. **Contact Nexi** at `ecom-salessupport@nets.eu` to enable Apple Pay on your merchant ID
+2. Follow the [Apple Pay setup guide](https://developer.nexigroup.com/nets-easy/en-EU/docs/apple-pay/) to configure your Apple Pay certificates with Nexi
+
+Apple Pay requires iOS 16+.
+
+#### Remember Me / Tokenization
+
+Use [unscheduled subscriptions](https://developer.nexigroup.com/nets-easy/en-EU/docs/unscheduled-subscriptions-ucof/) for storing cards and charging later. Configured in the Create Payment API request — no plugin changes needed.
 
 ### Test Cards
 
