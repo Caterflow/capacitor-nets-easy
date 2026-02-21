@@ -22,16 +22,19 @@ jobs:
 
       - run: npm run build
 
-      # Authentication via OIDC Trusted Publishing — no NPM_TOKEN needed.
-      # Configured at: npmjs.com > Package Settings > Trusted publishing
-      #
-      # To fall back to token auth, uncomment the env block below
-      # and remove the .npmrc cleanup step.
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # Trusted Publishing requires npm 11.5.1+ for OIDC authentication.
+      # Node 22 ships with npm 10.x, so we upgrade.
+      - run: npm install -g npm@latest
 
       # Remove the .npmrc that setup-node creates with a token placeholder,
       # so npm falls through to OIDC authentication.
       - run: rm -f "$HOME/.npmrc"
 
+      # Authentication via OIDC Trusted Publishing — no NPM_TOKEN needed.
+      # Configured at: npmjs.com > Package Settings > Trusted publishing
+      #
+      # To fall back to token auth, uncomment the env block below
+      # and remove the two steps above.
       - run: npm publish --provenance --access public
+        # env:
+        #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
