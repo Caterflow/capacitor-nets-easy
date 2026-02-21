@@ -15,13 +15,18 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org
 
       - run: npm ci
 
       - run: npm run build
 
+      # Uses OIDC Trusted Publishing — no NPM_TOKEN needed.
+      # Configure at: npmjs.com > Package Settings > Trusted publishing
+      #
+      # For the initial publish (before trusted publishing is configured),
+      # uncomment the env line below and set the NPM_TOKEN secret.
       - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
