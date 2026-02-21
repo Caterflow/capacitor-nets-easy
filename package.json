@@ -1,6 +1,6 @@
 {
   "name": "capacitor-nets-easy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Capacitor plugin for Nets Easy (Nexi) in-app payments on iOS and Android",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -35,6 +35,10 @@
     "google-pay"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Caterflow/capacitor-nets-easy"
+  },
   "capacitor": {
     "ios": {
       "src": "ios"
