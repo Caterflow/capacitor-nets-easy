@@ -22,11 +22,10 @@ jobs:
 
       - run: npm run build
 
-      # Uses OIDC Trusted Publishing — no NPM_TOKEN needed.
-      # Configure at: npmjs.com > Package Settings > Trusted publishing
+      # Authentication via OIDC Trusted Publishing — no NPM_TOKEN needed.
+      # Configured at: npmjs.com > Package Settings > Trusted publishing
       #
-      # For the initial publish (before trusted publishing is configured),
-      # uncomment the env line below and set the NPM_TOKEN secret.
+      # To fall back to token auth, uncomment the env block below.
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # env:
+        #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
