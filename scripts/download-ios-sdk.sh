@@ -26,10 +26,14 @@ cd - > /dev/null
 mkdir -p "$DEST"
 cp -R "$TMPDIR/sdk/Mia.xcframework" "$DEST/"
 
-# Strip bitcode — Apple rejects submissions containing bitcode since Xcode 14
-echo "Stripping bitcode from Mia.xcframework..."
-find "$DEST/Mia.xcframework" -name "Mia" -type f | while read -r binary; do
-  xcrun bitcode_strip "$binary" -r -o "$binary"
-done
+# Strip bitcode if possible — Mia.xcframework v1.6.1 ships with bitcode,
+# which Apple rejects since Xcode 14. On macOS with Xcode this strips it here;
+# otherwise the podspec sets STRIP_BITCODE_FROM_COPIED_FILES=YES as a fallback.
+if command -v xcrun &>/dev/null; then
+  echo "Stripping bitcode from Mia.xcframework..."
+  find "$DEST/Mia.xcframework" -name "Mia" -type f | while read -r binary; do
+    xcrun bitcode_strip "$binary" -r -o "$binary"
+  done
+fi
 
 echo "Done. Mia.xcframework installed at $DEST/Mia.xcframework"

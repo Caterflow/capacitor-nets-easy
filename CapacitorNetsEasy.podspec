@@ -15,4 +15,5 @@ Pod::Spec.new do |s|
   s.dependency 'Capacitor'
   s.swift_version = '5.1'
   s.vendored_frameworks = 'ios/Frameworks/Mia.xcframework'
+  s.pod_target_xcconfig = { 'STRIP_BITCODE_FROM_COPIED_FILES' => 'YES' }
 end
