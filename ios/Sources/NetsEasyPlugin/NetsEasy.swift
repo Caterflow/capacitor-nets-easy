@@ -13,8 +13,8 @@ import Mia
         cancellation: @escaping (MiaCheckoutController) -> Void,
         failure: @escaping (MiaCheckoutController, Error) -> Void
     ) -> MiaCheckoutController {
-        return MiaSDK.checkoutController(
-            forPaymentWithID: paymentId,
+        return MiaSDK.checkoutControllerForPayment(
+            withID: paymentId,
             paymentURL: paymentURL,
             isEasyHostedWithRedirectURL: redirectURL,
             cancelURL: cancelURL,
