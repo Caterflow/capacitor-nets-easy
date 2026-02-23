@@ -1,6 +1,6 @@
 {
   "name": "capacitor-nets-easy",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Capacitor plugin for Nets Easy (Nexi) in-app payments on iOS and Android",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -20,7 +20,7 @@
     "build": "npm run clean && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm run download-ios-sdk",
     "download-ios-sdk": "bash scripts/download-ios-sdk.sh"
   },
   "keywords": [
