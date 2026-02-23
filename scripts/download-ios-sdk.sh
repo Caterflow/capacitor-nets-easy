@@ -26,4 +26,10 @@ cd - > /dev/null
 mkdir -p "$DEST"
 cp -R "$TMPDIR/sdk/Mia.xcframework" "$DEST/"
 
+# Strip bitcode — Apple rejects submissions containing bitcode since Xcode 14
+echo "Stripping bitcode from Mia.xcframework..."
+find "$DEST/Mia.xcframework" -name "Mia" -type f | while read -r binary; do
+  xcrun bitcode_strip "$binary" -r -o "$binary"
+done
+
 echo "Done. Mia.xcframework installed at $DEST/Mia.xcframework"
