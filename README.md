@@ -33,23 +33,14 @@ npx cap sync
 
 ### iOS Setup
 
-The Nets Easy iOS SDK (`Mia.xcframework`) is not available via CocoaPods or SPM, so it must be downloaded separately:
+The Nets Easy iOS SDK (`Mia.xcframework`) is bundled with the npm package — no manual download needed. Just install and sync:
 
 ```bash
-# From the plugin directory (or your project root):
-npx capacitor-nets-easy download-ios-sdk
-
-# Or manually:
-bash node_modules/capacitor-nets-easy/scripts/download-ios-sdk.sh
-```
-
-This downloads `Mia.xcframework` from the [official GitHub repository](https://github.com/Nets-eCom/Nets-Easy-iOS-SDK) into the plugin's `ios/Frameworks/` directory.
-
-Then sync:
-
-```bash
+npm install capacitor-nets-easy
 npx cap sync ios
 ```
+
+> **Bitcode:** The bundled `Mia.xcframework` has bitcode stripped automatically (Apple rejects bitcode since Xcode 14). The plugin's podspec also sets `STRIP_BITCODE_FROM_COPIED_FILES=YES` as a fallback.
 
 ### Android Setup
 
@@ -330,7 +321,14 @@ This plugin bundles / depends on:
 
 ### iOS: `Mia.xcframework not found`
 
-Run the download script:
+The framework should be bundled with the npm package. Try reinstalling:
+
+```bash
+npm install capacitor-nets-easy
+npx cap sync ios
+```
+
+If the framework is still missing, you can download it manually:
 
 ```bash
 bash node_modules/capacitor-nets-easy/scripts/download-ios-sdk.sh
