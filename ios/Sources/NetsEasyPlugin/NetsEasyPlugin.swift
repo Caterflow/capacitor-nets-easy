@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 import Capacitor
 import Mia
 
@@ -11,6 +12,14 @@ public class NetsEasyPlugin: CAPPlugin, CAPBridgedPlugin {
     ]
 
     private let implementation = NetsEasy()
+    private var debug = false
+
+    override public func load() {
+        debug = getConfig().getBoolean("debug", false)
+        if debug {
+            CAPLog.print("[NetsEasy] Debug logging enabled")
+        }
+    }
 
     @objc func startPayment(_ call: CAPPluginCall) {
         guard let paymentId = call.getString("paymentId") else {
@@ -26,6 +35,22 @@ public class NetsEasyPlugin: CAPPlugin, CAPBridgedPlugin {
         let returnUrl = call.getString("returnUrl") ?? "\(bundleId)://netseasy/return"
         let cancelUrl = call.getString("cancelUrl") ?? "\(bundleId)://netseasy/cancel"
 
+        if debug {
+            CAPLog.print("[NetsEasy] startPayment called with:" +
+                "\n  paymentId = \(paymentId)" +
+                "\n  checkoutUrl = \(checkoutUrl)" +
+                "\n  returnUrl = \(returnUrl)" +
+                "\n  cancelUrl = \(cancelUrl)")
+
+            let schemes = ["mobilepay://", "mobilepayonline://", "vipps://"]
+            for scheme in schemes {
+                if let url = URL(string: scheme) {
+                    let canOpen = UIApplication.shared.canOpenURL(url)
+                    CAPLog.print("[NetsEasy] canOpenURL(\(scheme)): \(canOpen)")
+                }
+            }
+        }
+
         call.keepAlive = true
 
         let checkoutController = implementation.createCheckoutController(
@@ -34,6 +59,7 @@ public class NetsEasyPlugin: CAPPlugin, CAPBridgedPlugin {
             redirectURL: returnUrl,
             cancelURL: cancelUrl,
             success: { [weak self] controller in
+                if self?.debug == true { CAPLog.print("[NetsEasy] Payment completed: \(paymentId)") }
                 DispatchQueue.main.async {
                     controller.dismiss(animated: true) {
                         call.resolve([
@@ -45,6 +71,7 @@ public class NetsEasyPlugin: CAPPlugin, CAPBridgedPlugin {
                 }
             },
             cancellation: { [weak self] controller in
+                if self?.debug == true { CAPLog.print("[NetsEasy] Payment cancelled: \(paymentId)") }
                 DispatchQueue.main.async {
                     controller.dismiss(animated: true) {
                         call.resolve([
@@ -56,6 +83,7 @@ public class NetsEasyPlugin: CAPPlugin, CAPBridgedPlugin {
                 }
             },
             failure: { [weak self] controller, error in
+                if self?.debug == true { CAPLog.print("[NetsEasy] Payment failed: \(paymentId), error: \(error.localizedDescription)") }
                 DispatchQueue.main.async {
                     controller.dismiss(animated: true) {
                         call.resolve([

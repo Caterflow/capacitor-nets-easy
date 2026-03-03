@@ -2,6 +2,7 @@ package com.caterflow.capacitor.netseasy;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Logger;
@@ -27,15 +28,22 @@ public class NetsEasyPlugin extends Plugin {
 
     private final NetsEasy implementation = new NetsEasy();
     private String savedCallbackId;
+    private boolean debug = false;
 
     @Override
     public void load() {
+        debug = getConfig().getBoolean("debug", false);
+
         // Verify our hardcoded request code matches the SDK's actual value
         if (EASY_SDK_REQUEST_CODE_VALUE != MiASDK.EASY_SDK_REQUEST_CODE) {
             Logger.error(TAG,
                 "EASY_SDK_REQUEST_CODE mismatch! Plugin expects " + EASY_SDK_REQUEST_CODE_VALUE +
                 " but SDK has " + MiASDK.EASY_SDK_REQUEST_CODE +
                 ". Activity results may not be routed correctly.", null);
+        }
+
+        if (debug) {
+            Logger.debug(TAG, "Debug logging enabled");
         }
     }
 
@@ -57,6 +65,25 @@ public class NetsEasyPlugin extends Plugin {
         String returnUrl = call.getString("returnUrl", packageName + "://netseasy/return");
         String cancelUrl = call.getString("cancelUrl", packageName + "://netseasy/cancel");
 
+        if (debug) {
+            Logger.debug(TAG, "startPayment called with:" +
+                "\n  paymentId = " + paymentId +
+                "\n  checkoutUrl = " + checkoutUrl +
+                "\n  returnUrl = " + returnUrl +
+                "\n  cancelUrl = " + cancelUrl);
+
+            PackageManager pm = getContext().getPackageManager();
+            String[] packages = { "dk.danskebank.mobilepay", "no.dnb.vipps" };
+            for (String pkg : packages) {
+                try {
+                    pm.getPackageInfo(pkg, 0);
+                    Logger.debug(TAG, "Package " + pkg + ": INSTALLED");
+                } catch (PackageManager.NameNotFoundException e) {
+                    Logger.debug(TAG, "Package " + pkg + ": NOT FOUND");
+                }
+            }
+        }
+
         // Save the call so we can resolve it when onActivityResult fires
         getBridge().saveCall(call);
         savedCallbackId = call.getCallbackId();
@@ -67,6 +94,10 @@ public class NetsEasyPlugin extends Plugin {
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         super.handleOnActivityResult(requestCode, resultCode, data);
+
+        if (debug) {
+            Logger.debug(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+        }
 
         if (requestCode != MiASDK.EASY_SDK_REQUEST_CODE) {
             return;
@@ -90,9 +121,11 @@ public class NetsEasyPlugin extends Plugin {
                 switch (result.getMiaResultCode()) {
                     case RESULT_PAYMENT_COMPLETED:
                         ret.put("status", "completed");
+                        if (debug) Logger.debug(TAG, "Payment completed: " + paymentId);
                         break;
                     case RESULT_PAYMENT_CANCELLED:
                         ret.put("status", "cancelled");
+                        if (debug) Logger.debug(TAG, "Payment cancelled: " + paymentId);
                         break;
                     case RESULT_PAYMENT_FAILED:
                         ret.put("status", "failed");
@@ -101,15 +134,18 @@ public class NetsEasyPlugin extends Plugin {
                             errorMessage = result.getMiaError().getErrorMessage();
                         }
                         ret.put("error", errorMessage);
+                        if (debug) Logger.debug(TAG, "Payment failed: " + paymentId + ", error: " + errorMessage);
                         break;
                     default:
                         ret.put("status", "failed");
                         ret.put("error", "Unknown result code");
+                        if (debug) Logger.debug(TAG, "Payment unknown result code: " + paymentId);
                         break;
                 }
 
                 call.resolve(ret);
             } else {
+                if (debug) Logger.debug(TAG, "No result from payment SDK: " + paymentId);
                 JSObject ret = new JSObject();
                 ret.put("status", "failed");
                 ret.put("paymentId", paymentId);
@@ -118,6 +154,7 @@ public class NetsEasyPlugin extends Plugin {
             }
         } else {
             // Activity was cancelled without a proper result (e.g. back button before SDK loaded)
+            if (debug) Logger.debug(TAG, "Activity cancelled without SDK result: " + paymentId);
             JSObject ret = new JSObject();
             ret.put("status", "cancelled");
             ret.put("paymentId", paymentId);

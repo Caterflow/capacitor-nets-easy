@@ -330,6 +330,32 @@ This plugin bundles / depends on:
 | iOS | [Nets-Easy-iOS-SDK](https://github.com/Nets-eCom/Nets-Easy-iOS-SDK) (Mia.xcframework) | 1.6.1 |
 | Android | [Nets-Easy-Android-SDK](https://github.com/Nets-eCom/Nets-Easy-Android-SDK) (eu.nets.mia:mia-sdk) | 1.6.1 |
 
+## Debug Logging
+
+To help diagnose issues like MobilePay app-switching not working, you can enable debug logging via plugin config in your `capacitor.config.ts`:
+
+```ts
+const config: CapacitorConfig = {
+  // ...
+  plugins: {
+    NetsEasy: {
+      debug: true
+    }
+  }
+};
+```
+
+When enabled, the plugin logs:
+
+- **Payment parameters** — `paymentId`, `checkoutUrl`, `returnUrl`, `cancelUrl` passed to `startPayment()`
+- **App visibility** — whether MobilePay/Vipps apps are detected (Android: `PackageManager` query for `dk.danskebank.mobilepay` and `no.dnb.vipps`; iOS: `canOpenURL` for `mobilepay://`, `mobilepayonline://`, `vipps://`)
+- **Payment result** — the outcome of each payment (completed, cancelled, failed) with error details
+
+**Android:** Filter logcat by the `NetsEasy` tag.
+**iOS:** Look for `[NetsEasy]` in the Xcode console.
+
+Set `debug: false` or remove the key to disable logging.
+
 ## Troubleshooting
 
 ### iOS: `Mia.xcframework not found`
