@@ -243,7 +243,20 @@ Visa, MasterCard, Dankort, AmEx — enabled by default. No additional setup.
 
 #### MobilePay
 
-The SDK handles app-switching automatically (iOS v1.4.0+ / Android). Enable MobilePay on your merchant account in the [Easy Portal](https://portal.dibspayment.eu/). On iOS, add `mobilepay` to `LSApplicationQueriesSchemes` in your `Info.plist` for app-switching to work.
+The SDK handles app-switching automatically (iOS v1.4.0+ / Android). Enable MobilePay on your merchant account in the [Easy Portal](https://portal.dibspayment.eu/).
+
+**iOS:** Add `mobilepay`, `mobilepayonline`, and `mobilepayonline-test` to `LSApplicationQueriesSchemes` in your `Info.plist` for app-switching to work.
+
+**Android:** On Android 11+ (API 30+), the OS blocks `PackageManager` queries by default. This plugin's `AndroidManifest.xml` already declares the required `<queries>` entries for MobilePay and Vipps, so they are merged into your app automatically via manifest merging. If you override manifest merging or strip library manifest entries, make sure your app's `AndroidManifest.xml` includes:
+
+```xml
+<queries>
+    <package android:name="dk.danskebank.mobilepay" />
+    <package android:name="no.dnb.vipps" />
+</queries>
+```
+
+Without these entries, the SDK cannot detect the MobilePay/Vipps app and falls back to the web-based phone number flow.
 
 #### Google Pay (Android)
 
@@ -357,8 +370,8 @@ Make sure the `returnUrl` and `cancelUrl` in your Create Payment API request mat
 
 ### MobilePay app-switching not working
 
-- iOS: Ensure `LSApplicationQueriesSchemes` includes `mobilepay` in your `Info.plist`
-- Android: MobilePay should work out of the box if enabled server-side
+- **iOS:** Ensure `LSApplicationQueriesSchemes` in your `Info.plist` includes all three schemes: `mobilepay`, `mobilepayonline`, and `mobilepayonline-test`. Without these, iOS blocks the URL scheme check and the SDK falls back to the web-based phone number flow.
+- **Android:** On Android 11+ (API 30+), the OS requires `<queries>` entries in `AndroidManifest.xml` for the SDK to detect MobilePay/Vipps. This plugin ships those entries and they are merged automatically. If app-switching still doesn't work, verify the entries are present in your merged manifest (`app/build/intermediates/merged_manifests/`) — look for `dk.danskebank.mobilepay` and `no.dnb.vipps`.
 
 ## License
 

@@ -1,3 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Required on Android 11+ (API 30+) for MobilePay / Vipps app-switch payments.
+         Without these, PackageManager queries are blocked and the SDK falls back
+         to the web-based phone number flow instead of launching the app. -->
+    <queries>
+        <package android:name="dk.danskebank.mobilepay" />
+        <package android:name="no.dnb.vipps" />
+    </queries>
 </manifest>
